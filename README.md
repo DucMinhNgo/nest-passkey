@@ -1,9 +1,9 @@
-# Passkey Tutorial: Node.js (Express), JavaScript, MySQL & SimpleWebAuthn
+# Nest Passkey: Node.js (Express), JavaScript, MySQL & SimpleWebAuthn
 
 ## Introduction
 
 Welcome to repository of the
-[Passkey Tutorial](https://www.corbado.com/blog/passkey-tutorial-how-to-implement-passkeys)!
+[Nest Passkey](https://www.corbado.com/blog/passkey-tutorial-how-to-implement-passkeys)!
 This
 [tutorial](https://www.corbado.com/blog/passkey-tutorial-how-to-implement-passkeys)
 showcases **how to implement passkeys in a simple web app**, thus offering a
@@ -26,7 +26,7 @@ basic knowledge in these areas is helpful:
 
 ## Features
 
-In this passkey tutorial project, we implement the two basic WebAuthn / passkey
+In this Nest Passkey project, we implement the two basic WebAuthn / passkey
 cereomonies to sign-up / register and log in / authenticate with a passkey.
 
 ### Passkey Sign-Up

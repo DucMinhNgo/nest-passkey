@@ -1,9 +1,9 @@
-import {promisePool} from '../database';
-import type {AuthenticatorDevice} from '@simplewebauthn/typescript-types';
+import { promisePool } from '../database';
+import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
 
 
 export const credentialService = {
-    async saveNewCredential(userId: string, credentialId: string, publicKey: string, counter: number, transports: string) {
+    async saveNewCredential(userId: string, credentialId: any, publicKey: any, counter: number, transports: string) {
         try {
             await promisePool.query(
                 'INSERT INTO credentials (user_id, credential_id, public_key, counter, transports) VALUES (?, ?, ?, ?, ?)',
@@ -17,7 +17,7 @@ export const credentialService = {
 
     async getCredentialByCredentialId(credentialId: string, userId: string): Promise<AuthenticatorDevice | null> {
         try {
-            const [rows] = await promisePool.query( "SELECT * FROM credentials WHERE credential_id = ? AND user_id = ? LIMIT 1", [credentialId, userId] )
+            const [rows] = await promisePool.query("SELECT * FROM credentials WHERE credential_id = ? AND user_id = ? LIMIT 1", [credentialId, userId])
             // @ts-ignore
             if (rows.length === 0) return null;
             // @ts-ignore
@@ -33,6 +33,20 @@ export const credentialService = {
             console.error('Error retrieving credential:', error);
             throw error;
         }
+    },
+
+    async getPassKey(userId: string) {
+        const [rows] = await promisePool.query("SELECT * FROM credentials WHERE user_id = ?", [userId]);
+        // @ts-ignore
+        if (rows.length === 0) return [];
+        // @ts-ignore
+        return rows.map((row) => ({
+            userID: row.user_id,
+            credentialID: row.credential_id,
+            credentialPublicKey: row.public_key,
+            counter: row.counter,
+            transports: row.transports ? row.transports.split(',') : [],
+        }));
     },
 
     async updateCredentialCounter(credentialId: string, newCounter: number) {

@@ -9,6 +9,9 @@ function showMessage(message, isError = false) {
 }
 
 async function register() {
+    console.log("DEVICE");
+    console.log(window.navigator.userAgent);
+    console.log("DEVICE");
     // Retrieve the username from the input field
     const username = document.getElementById('username').value;
 
@@ -32,6 +35,7 @@ async function register() {
         // This triggers the browser to display the passkey / WebAuthn modal (e.g. Face ID, Touch ID, Windows Hello).
         // A new attestation is created. This also means a new public-private-key pair is created.
         const attestationResponse = await SimpleWebAuthnBrowser.startRegistration(options);
+        console.log(attestationResponse);
 
         // Send attestationResponse back to server for verification and storage.
         const verificationResponse = await fetch('/api/passkey/registerFinish', {

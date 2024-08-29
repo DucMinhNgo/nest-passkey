@@ -2,16 +2,16 @@ import { Request, Response, NextFunction } from 'express';
 import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { uint8ArrayToBase64, base64ToUint8Array } from '../utils/utils';
 import { rpID, origin } from '../utils/constants';
-import {credentialService} from '../services/credentialService';
-import {userService} from '../services/userService'
-import {AuthenticatorDevice} from "@simplewebauthn/typescript-types";
-import {isoBase64URL} from "@simplewebauthn/server/helpers";
-import {VerifiedAuthenticationResponse, VerifyAuthenticationResponseOpts} from "@simplewebauthn/server/esm";
+import { credentialService } from '../services/credentialService';
+import { userService } from '../services/userService'
+import { AuthenticatorDevice } from "@simplewebauthn/typescript-types";
+import { isoBase64URL } from "@simplewebauthn/server/helpers";
+import { VerifiedAuthenticationResponse, VerifyAuthenticationResponseOpts } from "@simplewebauthn/server/esm";
 import { CustomError } from '../middleware/customError';
 
 
 export const handleLoginStart = async (req: Request, res: Response, next: NextFunction) => {
-    const {username} = req.body;
+    const { username } = req.body;
     try {
         const user = await userService.getUserByUsername(username);
         if (!user) {
@@ -30,6 +30,8 @@ export const handleLoginStart = async (req: Request, res: Response, next: NextFu
         });
 
         req.session.currentChallenge = options.challenge;
+        console.log({ options });
+
         res.send(options);
     } catch (error) {
         next(error instanceof CustomError ? error : new CustomError('Internal Server Error', 500));
@@ -37,8 +39,10 @@ export const handleLoginStart = async (req: Request, res: Response, next: NextFu
 };
 
 export const handleLoginFinish = async (req: Request, res: Response, next: NextFunction) => {
-    const {body} = req;
-    const {currentChallenge, loggedInUserId} = req.session;
+    const { body } = req;
+    console.log({ body });
+
+    const { currentChallenge, loggedInUserId } = req.session;
 
     if (!loggedInUserId) {
         return next(new CustomError('User ID is missing', 400));
@@ -52,7 +56,7 @@ export const handleLoginFinish = async (req: Request, res: Response, next: NextF
 
         const credentialID = isoBase64URL.toBase64(body.rawId);
         const bodyCredIDBuffer = isoBase64URL.toBuffer(body.rawId);
-        const dbCredential : AuthenticatorDevice | null = await credentialService.getCredentialByCredentialId(credentialID, loggedInUserId);
+        const dbCredential: AuthenticatorDevice | null = await credentialService.getCredentialByCredentialId(credentialID, loggedInUserId);
         if (!dbCredential) {
             return next(new CustomError('Credential not registered with this site', 404));
         }
@@ -85,7 +89,7 @@ export const handleLoginFinish = async (req: Request, res: Response, next: NextF
                 uint8ArrayToBase64(bodyCredIDBuffer),
                 authenticationInfo.newCounter
             );
-            res.send({verified: true});
+            res.send({ verified: true });
         } else {
             next(new CustomError('Verification failed', 400));
         }
